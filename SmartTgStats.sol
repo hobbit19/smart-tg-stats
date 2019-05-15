@@ -22,6 +22,7 @@ contract SmartTgStats {
     Request[]                   requests;
 
     event                       NewRequest(uint);
+    event                       NewResponse(uint);
 
     constructor(bool _isOn) public payable {
         owner = msg.sender;
@@ -53,26 +54,32 @@ contract SmartTgStats {
             true,
             block.timestamp, 0,
             0, 0, 0));
+
        emit NewRequest(requests.length - 1);
    }
 
   function AddResponse(uint _requestID, bool _willUpdate, uint32 _subscribers, uint32 _postViews, uint256 _postTime) public {
     require(owner != address(0));
     require(owner == msg.sender);
+    require(_requestID <= requests.length -1);
+    require(requests[_requestID].willUpdate == true);
+
     requests[_requestID].willUpdate = _willUpdate;
     requests[_requestID].lastSubscribers = _subscribers;
     requests[_requestID].lastPostViews = _postViews;
     requests[_requestID].postTime = _postTime;
+
+    emit NewResponse(_requestID);
   }
 
-    function Withdraw(address payable _to, uint256 _amount) public {
+  function Withdraw(address payable _to, uint256 _amount) public {
 
-        require(owner != address(0));
-        require(msg.sender == owner);
+      require(owner != address(0));
+      require(msg.sender == owner);
 
-        require(balance >= _amount);
-        balance -= _amount;
+      require(balance >= _amount);
+      balance -= _amount;
 
-        _to.transfer(_amount);
-  }
+      _to.transfer(_amount);
+    }
 }

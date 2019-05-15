@@ -11,10 +11,9 @@ export GIT_SSH_COMMAND='ssh -o ControlMaster=no'
 all: build run
 
 sol:
-	go get github.com/ethereum/go-ethereum
-	$(eval ETH := ${GOPATH}/src/github.com/ethereum/go-ethereum/)
-	make -C ${ETH}
-	make -C ${ETH} devtools
+	go get -u -v github.com/ethereum/go-ethereum
+	make -C ${GOPATH}/src/github.com/ethereum/go-ethereum/
+	make -C ${GOPATH}/src/github.com/ethereum/go-ethereum/ devtools
 
 	solc --abi --bin --overwrite SmartTgStats.sol -o ${TMPDIR}
 
