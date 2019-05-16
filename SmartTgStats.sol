@@ -1,5 +1,4 @@
 
-
 contract SmartTgStats {
 
     address                     owner;
@@ -20,14 +19,22 @@ contract SmartTgStats {
     }
 
     Request[]                   requests;
+    mapping (bytes32 => Request) requestsMap;
 
     event                       NewRequest(uint);
     event                       NewResponse(uint);
 
     constructor(bool _isOn) public payable {
+        require(owner == address(0));
         owner = msg.sender;
         status = _isOn;
         statusRenew = block.timestamp;
+
+        requests.push(requestsMap[""]); // prevent zero requestID
+    }
+
+    function LastRequestID() public view returns (uint256) {
+        return requests.length - 1;
     }
 
    function RenewStatus(bool _isOn) public {
@@ -47,13 +54,17 @@ contract SmartTgStats {
        require(msg.value >= 0);
        balance += msg.value;
 
-       requests.push(Request(
+       Request memory request = Request(
             _channel,
             _postID,
             msg.value,
             true,
             block.timestamp, 0,
-            0, 0, 0));
+            0, 0, 0);
+       requests.push(request);
+
+       bytes32 hash = ""; // TODO
+       requestsMap[hash] = request;
 
        emit NewRequest(requests.length - 1);
    }
@@ -69,17 +80,20 @@ contract SmartTgStats {
     requests[_requestID].lastPostViews = _postViews;
     requests[_requestID].postTime = _postTime;
 
+    bytes32 hash = ""; // TODO
+    requestsMap[hash] = requests[_requestID];
+
     emit NewResponse(_requestID);
   }
 
   function Withdraw(address payable _to, uint256 _amount) public {
 
-      require(owner != address(0));
-      require(msg.sender == owner);
+    require(owner != address(0));
+    require(msg.sender == owner);
 
-      require(balance >= _amount);
-      balance -= _amount;
+    require(balance >= _amount);
+    balance -= _amount;
 
-      _to.transfer(_amount);
-    }
+    _to.transfer(_amount);
+  }
 }

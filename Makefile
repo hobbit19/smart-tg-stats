@@ -8,6 +8,11 @@ export TMPDIR := /tmp
 
 export GIT_SSH_COMMAND='ssh -o ControlMaster=no'
 
+# Use GOPATH if provided OR assume default GOPATH - WORKS ON MAC & LINUX
+ifndef GOPATH
+	override GOPATH = '${HOME}/go'
+endif
+
 all: build run
 
 sol:
