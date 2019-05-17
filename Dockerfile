@@ -6,6 +6,6 @@ COPY . .
 RUN mv go-ethereum /go/src/.
 
 RUN bash build.sh
-RUN make sol build install
+RUN make
 
 CMD ["run_backend"]

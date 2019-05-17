@@ -1,6 +1,5 @@
 #!/bin/bash -e
 
-
 # Install Solidity compiler
 brew list solidity || install solidity
 

@@ -1,13 +1,7 @@
 #!/bin/bash -e
 
-# Install Solidity compiler
-apt-get update
-apt-get install -y software-properties-common
-add-apt-repository -y ppa:ethereum/ethereum
-apt-get update
-apt-get install -y solc
-
 # Install dependencies for tdlib
+apt-get update
 apt install -y libssl-dev g++ build-essential gperf zlib1g-dev cmake
 
 # Build tdlib
