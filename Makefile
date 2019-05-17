@@ -26,7 +26,10 @@ sol:
 
 build:
 	go get -d .
-	go build -o ${OUTDIR}/run_backend
+	go build -v -o ${OUTDIR}/run_backend
 
 run:
 	${OUTDIR}/run_backend
+
+install:
+	go install -v ${OUTDIR}/run_backend

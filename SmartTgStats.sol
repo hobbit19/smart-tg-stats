@@ -28,7 +28,7 @@ contract SmartTgStats {
   }
 
   mapping (uint256 => Request)    public Requests;
-  uint256                         maxRequestID;
+  uint256                         public maxRequestID;
 
   event                       NewRequest(uint);
   event                       NewResponse(uint);
