@@ -1,0 +1,6 @@
+[submodule "td"]
+	path = td
+	url = https://github.com/tdlib/td.git
+[submodule "go-ethereum"]
+	path = go-ethereum
+	url = https://github.com/ethereum/go-ethereum
