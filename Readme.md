@@ -79,12 +79,23 @@ Frontend: https://crackhd.github.io/smart-tg-stats
 
 # Deploy your instance
 
-## Container
-`git submodule update -r --init`
-`docker build -t smart-tg-stats .`
-
 ## Local
 Use scripts `./build.sh` (or `./build-mac.sh`) to install/build dependencies.
 
 Then `make` to run the build and app locally.
 `make sol` is needed once to re/generate Go bindings for contract.
+
+## Container
+
+1. Build image
+
+`git submodule update -r --init`
+`docker build -t smart-tg-stats .`
+
+2. Run local instance [once] - to Sign-In into Telegram and generate `./session/` contents:
+
+`make run`
+
+2. Create and run daemonized container using initialized `./session/`:
+
+`docker run -d -v session:/go/src/app/session --name tg-backend smart-tg-stats`

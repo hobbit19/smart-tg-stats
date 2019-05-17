@@ -8,7 +8,7 @@ import (
 
 func main() {
 	tdlib.SetLogVerbosityLevel(1)
-	tdlib.SetFilePath("./errors.txt")
+	tdlib.SetFilePath("./session/errors.txt")
 
 	// Create new instance of client
 	client := tdlib.NewClient(tdlib.Config{
@@ -22,8 +22,8 @@ func main() {
 		UseFileDatabase:     true,
 		UseChatInfoDatabase: true,
 		UseTestDataCenter:   false,
-		DatabaseDirectory:   "./tdlib-db",
-		FileDirectory:       "./tdlib-files",
+		DatabaseDirectory:   "./session/tdlib-db",
+		FileDirectory:       "./session/tdlib-files",
 		IgnoreFileNames:     false,
 	})
 
