@@ -1,5 +1,7 @@
 .git/
 bin/
+
 build/
 .success
-errors.txt
+
+/session
