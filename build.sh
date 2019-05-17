@@ -5,7 +5,6 @@ apt-get update
 apt install -y libssl-dev g++ build-essential gperf zlib1g-dev cmake
 
 # Build tdlib
-
 cd td
 mkdir -p build
 cd build
@@ -16,7 +15,7 @@ if [ -f .success ]; then
 fi
 
 cmake -DCMAKE_BUILD_TYPE=Release ..
-cmake --build . -- -j5
+cmake --build . -- -j1
 
 make install
 

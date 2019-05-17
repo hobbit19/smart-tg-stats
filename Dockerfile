@@ -6,6 +6,6 @@ COPY . .
 RUN mv go-ethereum /go/src/.
 
 RUN bash build.sh
-RUN make
+RUN make build
 
-CMD ["run_backend"]
+ENTRYPOINT ["bin/run_backend"]

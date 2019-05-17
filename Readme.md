@@ -102,4 +102,4 @@ Use `make` to run the app.
 
 2. Create and run daemonized container using initialized `./session/`:
 
-`docker run -v session:/go/src/app/session --name tg-backend -d smart-tg-stats`
+`docker run -v $(pwd)/session:/go/src/app/session --name tg-backend -d --entrypoint /go/src/app/bin/run_backend smart-tg-stats`
