@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "/smart-tg-stats/static/css/main.2cce8147.chunk.css",
+    "main.js": "/smart-tg-stats/static/js/main.9cc139fa.chunk.js",
+    "main.js.map": "/smart-tg-stats/static/js/main.9cc139fa.chunk.js.map",
+    "runtime~main.js": "/smart-tg-stats/static/js/runtime~main.3b0d2042.js",
+    "runtime~main.js.map": "/smart-tg-stats/static/js/runtime~main.3b0d2042.js.map",
+    "static/js/2.b41502e9.chunk.js": "/smart-tg-stats/static/js/2.b41502e9.chunk.js",
+    "static/js/2.b41502e9.chunk.js.map": "/smart-tg-stats/static/js/2.b41502e9.chunk.js.map",
+    "index.html": "/smart-tg-stats/index.html",
+    "precache-manifest.385d0bf3e009a971580b41378bef488b.js": "/smart-tg-stats/precache-manifest.385d0bf3e009a971580b41378bef488b.js",
+    "service-worker.js": "/smart-tg-stats/service-worker.js",
+    "static/css/main.2cce8147.chunk.css.map": "/smart-tg-stats/static/css/main.2cce8147.chunk.css.map",
+    "static/media/logo.svg": "/smart-tg-stats/static/media/logo.5d5d9eef.svg"
+  }
+}
