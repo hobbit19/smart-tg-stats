@@ -3,8 +3,8 @@
 contract SmartTgStats {
 
   address                     owner;
-  bool                        status;
-  uint256                     statusRenew;
+  bool                 public status;
+  uint256              public statusRenew;
 
   enum ProcErr {
     None,

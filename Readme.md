@@ -9,17 +9,17 @@ stat information for posts in channels inside Telegram Messenger.
 
 ```sol
 
-  Request[] public            Requests;
-  uint256 Public              maxRequestID;
+bool     public             status;      // must be true if robot is online
+uint256  public             statusRenew; // timestamp; must be bigger than UTCNOW-24h
 
-  event                       NewRequest(uint);
-  event                       NewResponse(uint);
+Request[] public            Requests;     // Getter for request/response data
+uint256   public            maxRequestID; // latest requestID
 
-  function AddRequest(string _channel, uint32 _postID)
-                        public payable returns (uint256 requestID);
+function AddRequest(string _channel, uint32 _postID)
+                      public payable returns (uint256 requestID);
 
-  bool                        status;      // must be true if robot is online
-  uint256                     statusRenew; // timestamp; must be bigger than UTCNOW-24h
+event                       NewRequest(uint);
+event                       NewResponse(uint);
 ```
 
 # Request
