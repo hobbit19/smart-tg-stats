@@ -92,7 +92,7 @@ func (self * tg_agent) setup(allowsPrompts bool) error {
 				break
 			}
 		} else if currentState.GetAuthorizationStateEnum() == tdlib.AuthorizationStateReadyType {
-			fmt.Println("Authorization Ready! Let's rock")
+			fmt.Println("[Telegram] Authorization Ready! Let's rock")
 			break
 		}
 	}
@@ -110,6 +110,7 @@ func (self * tg_agent) update_loop() {
 	}
 }
 
-func (self * tg_agent) ProcessRequest(request contract_request, ceo contract_ceo) error {
+func (self * tg_agent) ProcessRequest(request contract_request, ceo contract_ceo, lock mutex) error {
+	defer lock.Release()
 	return errors.New("Not implemented (TODO)")
 }

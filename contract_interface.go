@@ -52,24 +52,26 @@ type contract_ceo interface {
 }
 
 type contract_backend interface {
-  ProcessRequest(contract_request, contract_ceo) error
+  ProcessRequest(contract_request, contract_ceo, mutex) error
 }
 
 type contract_interface struct {
   node_address      string
   contract_address  string
   business_backend  contract_backend
+  locker            * mutex_helper
   address           common.Address
   eth_client        * ethclient.Client
   eth_contract      * SmartTgStats
   ceo_session       * SmartTgStatsSession
 }
 
-func NewContractInterface(node_address string, contract_address string, backend contract_backend) * contract_interface {
+func NewContractInterface(node_address string, contract_address string, backend contract_backend, locker * mutex_helper) * contract_interface {
   return &contract_interface{
-    node_address: node_address,
+    node_address:     node_address,
     contract_address: contract_address,
     business_backend: backend,
+    locker:           locker,
   }
 }
 
@@ -168,7 +170,7 @@ func (self * contract_interface) renew_if_needed() bool {
         if !pubStatus || pubStatusTime.Cmp(maxActualTime) >= 0 {
           fmt.Printf("Status renew is required: status %d from %s\n", pubStatus, pubStatusTime.String())
            if err := self.RenewStatus(true); err == nil {
-             time.Sleep(60)
+             time.Sleep(time.Second * 60)
            } else {
              fmt.Printf("[Warning] error transaction [CEORenewStatus] (retry): %s\n", err.Error())
              return false
@@ -204,7 +206,7 @@ func (self * contract_interface) poll_loop() {
 
   for {
 
-    time.Sleep(70)
+    time.Sleep(time.Second * 70)
 
     if !self.renew_if_needed() {
       continue
@@ -219,8 +221,8 @@ func (self * contract_interface) poll_loop() {
       continue
     }
 
-    if max.Cmp(min) == 0 {
-      fmt.Println("There are no requests at all (retry after pause)")
+    if max.Cmp(min) < 0 {
+      fmt.Printf("There are no requests at all (retry after pause). max: %s, min: %s\n", max.String(), min.String())
       break
     }
 
@@ -228,7 +230,11 @@ func (self * contract_interface) poll_loop() {
 
     requests := make([]contract_request, 0)
 
-    for i := new(big.Int).Set(min); i.Cmp(max) <= 0; i.Add(i, step) {
+    fmt.Printf("Max is %s, min is %s, step is %s\n", max.String(), min.String(), step.String())
+
+    for i := big.NewInt(0).Set(min); i.Cmp(max) <= 0; i.Add(i, step) {
+
+      fmt.Println("Added active request ID ", i.String())
 
       eth_req, err := self.ceo_session.Requests(i)
       if err != nil {
@@ -242,7 +248,7 @@ func (self * contract_interface) poll_loop() {
       }
 
       requests = append(requests, contract_request{
-        ID:         i,
+        ID:         big.NewInt(0).Set(i),
         Channel:    eth_req.Channel,
         PostID:     eth_req.PostID,
         Bid:        eth_req.Bid,
@@ -262,7 +268,7 @@ func (self * contract_interface) poll_loop() {
       break
     }
 
-    fmt.Printf("Active requests: %d\n", len(requests))
+    fmt.Printf("Requests: %d\n", len(requests))
 
     // ================== SORT REQUESTS BY BID AND TIME ========================
 
@@ -275,9 +281,22 @@ func (self * contract_interface) poll_loop() {
     // =================== FEED REQUESTS TO THE BACKEND ========================
 
     for _, req := range requests {
-      err := self.business_backend.ProcessRequest(req, self)
+
+      // Prevent multi instances from processing the same request
+      // FIXME: crash
+      lock, err := self.locker.LockOnRequest(req.ID.String())
+      if err == ErrLockedAlready {
+        continue
+      } else if err != nil {
+        fmt.Printf("An error has occured in locker [LockOnRequest] (ignore): %s\n", err.Error())
+        continue
+      }
+
+      fmt.Println("Processing request (locked) ID ", req.ID.String())
+
+      err = self.business_backend.ProcessRequest(req, self, lock)
       if err != nil {
-        fmt.Printf("Backend [ProcessRequest] failed (%d) (ignore): %s", req.ID.Uint64(), err.Error())
+        fmt.Printf("Backend [ProcessRequest] failed (%s) (ignore): %s\n", req.ID.String(), err.Error())
       }
     }
 

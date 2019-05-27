@@ -12,9 +12,11 @@ var (
   allowsPrompts     = false
   ceo_ks_file       string
   ceo_pwd_file      string
+  redis_host        string
 
-  agent * tg_agent
-  contract * contract_interface
+  locker      * mutex_helper
+  contract    * contract_interface
+  agent       * tg_agent
 )
 
 func getEnv(key, defaultValue string) string {
@@ -37,7 +39,13 @@ func init() {
 
   node := getEnv("ETH_NODE_ADDRESS", "")
   addr := getEnv("ETH_CONTRACT_ADDRESS", "")
-  contract = NewContractInterface(node, addr, agent)
+
+  redis_host = getEnv("REDIS_HOST", "")
+  redis_port := getEnv("REDIS_PORT", "6379")
+
+  locker = NewMutexHelper(addr, "tcp", fmt.Sprintf("%s:%s", redis_host, redis_port))
+
+  contract = NewContractInterface(node, addr, agent, locker)
 
   ceo_ks_file = getEnv("ETH_CONTRACT_CEO_KEYSTORE", "./ceo.json")
   if len(ceo_ks_file) == 0 {
@@ -53,6 +61,13 @@ func init() {
 }
 
 func main() {
+
+  if locker.IsFake {
+    fmt.Println("Not using Redis (locks will be ineffective)")
+  } else if err := locker.Connect(); err != nil {
+    fmt.Printf("Redis connection failed (exit): %s\n", err.Error())
+    os.Exit(1)
+  }
 
   // ============================= CONTRACT & NODE =============================
 
