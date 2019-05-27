@@ -19,7 +19,6 @@ if [ -f .success ]; then
   exit 0
 fi
 
-#cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/lib ..
 cmake -DCMAKE_BUILD_TYPE=Release -DOPENSSL_ROOT_DIR=/usr/local/opt/openssl/ ..
 cmake --build . -- -j5
 
