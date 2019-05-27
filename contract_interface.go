@@ -134,7 +134,7 @@ func (self * contract_interface) RenewStatus(is_on bool) error {
 
   tx, err := self.ceo_session.CEORenewStatus(is_on)
   if err == nil {
-    fmt.Printf("CEORenewStatus transaction with tx %s\n", tx.Hash())
+    fmt.Printf("CEORenewStatus transaction with tx %s\n", tx.Hash().String())
   }
 
 	return err
@@ -148,10 +148,44 @@ func (self * contract_interface) UpdateResponse(req contract_request) error {
 
   tx, err := self.ceo_session.CEOAddResponse(req.ID, req.WillUpdate, req.Subscribers, req.PostViews, req.PostTime, uint8(req.Error))
   if err == nil {
-    fmt.Printf("CEOAddResponse transaction with tx %s\n", tx.Hash())
+    fmt.Printf("CEOAddResponse transaction with tx %s\n", tx.Hash().String())
   }
 
   return err
+}
+
+func (self * contract_interface) renew_if_needed() bool {
+  pubStatus, err := self.ceo_session.Status()
+  if err == nil {
+
+      pubStatusTime, err := self.ceo_session.StatusRenew()
+      if err == nil {
+
+        maxActualTime := big.NewInt(0)
+        maxActualTime.Add(maxActualTime, pubStatusTime)
+        maxActualTime.Add(maxActualTime, big.NewInt(86400 - 200))
+
+        if !pubStatus || pubStatusTime.Cmp(maxActualTime) >= 0 {
+          fmt.Printf("Status renew is required: status %d from %s\n", pubStatus, pubStatusTime.String())
+           if err := self.RenewStatus(true); err == nil {
+             time.Sleep(60)
+           } else {
+             fmt.Printf("[Warning] error transaction [CEORenewStatus] (retry): %s\n", err.Error())
+             return false
+           }
+        }
+      } else {
+        fmt.Printf("[Warning] error getting contract [StatusRenew] (skip): %s\n", err.Error())
+        return false
+      }
+
+  } else {
+    fmt.Printf("[Warning] error getting contract [Status] (skip): %s\n", err.Error())
+    return false
+  }
+
+  return true
+
 }
 
 func (self * contract_interface) poll_loop() {
@@ -163,12 +197,18 @@ func (self * contract_interface) poll_loop() {
     panic(ErrNoBackend)
   }
 
-  step := big.NewInt(1)
-  min := big.NewInt(1)  // minimum valid request ID is 1, not 0
+  var (
+      step = big.NewInt(1)
+      min = big.NewInt(1)  // minimum valid request ID is 1, not 0
+  )
 
   for {
 
     time.Sleep(70)
+
+    if !self.renew_if_needed() {
+      continue
+    }
 
     // ======================== GET TOP REQUEST ID =============================
 

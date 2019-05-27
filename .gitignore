@@ -2,3 +2,4 @@ bin/
 /session
 ceo.json
 ceo_password.txt
+.DS_Store

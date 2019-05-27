@@ -104,8 +104,9 @@ func (self * tg_agent) update_loop() {
 	// Main loop
 	for update := range self.client.GetRawUpdatesChannel(10) {
 		// Show all updates
-		fmt.Println(update.Data)
-		fmt.Print("\n\n")
+		update = update
+		// fmt.Println(update.Data)
+		// fmt.Print("\n\n")
 	}
 }
 

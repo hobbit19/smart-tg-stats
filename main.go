@@ -102,5 +102,7 @@ func main() {
   go contract.poll_loop()
   go agent.update_loop()
 
+  // ========================= BACKGROUND ROUTINES =============================
+
   /* run forever */ for  {}
 }
